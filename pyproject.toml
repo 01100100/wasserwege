@@ -15,4 +15,32 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["pyarrow-stubs>=19.3", "ruff>=0.11.9"]
+dev = [
+    "pyarrow-stubs>=19.3",
+    "ruff>=0.11.9",
+    "shandy-sqlfmt[jinjafmt]>=0.26.0",
+    "sqlfluff>=3.4.0",
+    "sqlfluff-templater-dbt>=3.4.0",
+]
+
+
+[tool.sqlfluff.core]
+dialect = "duckdb"
+templater = "dbt"
+sql_file_exts = ".sql"
+exclude_rules = "layout.indent, layout.cte_bracket, layout.select_targets, layout.spacing"
+max_line_length = 88
+
+[tool.sqlfluff.templater.dbt]
+project_dir = "./quelle/"
+profiles_dir = "./quelle/"
+
+[tool.sqlfluff.templater.jinja]
+apply_dbt_builtins = true
+
+[tool.sqlfluff.rules]
+capitalisation_policy = "lower"
+extended_capitalisation_policy = "lower"
+
+[tool.sqlfluff.rules.convention.terminator]
+multiline_newline = true

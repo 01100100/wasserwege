@@ -9,13 +9,48 @@ repos:
           - id: check-yaml
           - id: check-added-large-files
           - id: check-merge-conflict
+          - id: detect-aws-credentials
+          - id: no-commit-to-branch
+          - id: pretty-format-json
+            args: ["--autofix"]
 
     - repo: https://github.com/charliermarsh/ruff-pre-commit
       rev: v0.11.9
       hooks:
           - id: ruff
+          - id: ruff-format
 
     - repo: https://github.com/pre-commit/mirrors-mypy
       rev: v1.15.0
       hooks:
           - id: mypy
+
+    - repo: https://github.com/tconbeer/sqlfmt
+      rev: v0.26.0
+      hooks:
+          - id: sqlfmt
+            language_version: python
+            additional_dependencies: [".[jinjafmt]"]
+            args: ["--reset-cache"]
+
+    - repo: https://github.com/astral-sh/uv-pre-commit
+      rev: 0.7.3
+      hooks:
+          - id: uv-lock
+
+    - repo: https://github.com/python-jsonschema/check-jsonschema
+      rev: 0.33.0
+      hooks:
+          - id: check-github-workflows
+            args: ["--verbose"]
+    - repo: https://github.com/sqlfluff/sqlfluff
+      rev: 3.4.0
+      hooks:
+          - id: sqlfluff-lint
+            additional_dependencies:
+                - dbt-duckdb
+                - sqlfluff-templater-dbt
+          - id: sqlfluff-fix
+            additional_dependencies:
+                - dbt-duckdb
+                - sqlfluff-templater-dbt

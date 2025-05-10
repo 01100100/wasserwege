@@ -57,8 +57,14 @@ def download_osm_file(country: Country, output_dir="data/raw", overwrite=False):
 
     if os.path.exists(osm_file):
         if not overwrite:
-            user_input = input(f"⚠️ {osm_file} already exists. Do you want to overwrite it? (y/n): ").strip().lower()
-            if user_input != 'y':
+            user_input = (
+                input(
+                    f"⚠️ {osm_file} already exists. Do you want to overwrite it? (y/n): "
+                )
+                .strip()
+                .lower()
+            )
+            if user_input != "y":
                 print(f"✅ {osm_file} already exists. Skipping download.")
                 return osm_file
 
@@ -98,8 +104,14 @@ def filter_waterways(osm_file, output_dir="data/filtered", overwrite=False):
 
     if os.path.exists(filtered_file):
         if not overwrite:
-            user_input = input(f"⚠️ {filtered_file} already exists. Do you want to overwrite it? (y/n): ").strip().lower()
-            if user_input != 'y':
+            user_input = (
+                input(
+                    f"⚠️ {filtered_file} already exists. Do you want to overwrite it? (y/n): "
+                )
+                .strip()
+                .lower()
+            )
+            if user_input != "y":
                 print("✅ Filtered waterways file is valid. Skipping filtering.")
                 return filtered_file
 
@@ -141,12 +153,20 @@ def convert_to_geoparquet(filtered_file, output_dir="data/parquet", overwrite=Fa
     jar_path = "ohsome-planet/ohsome-planet-cli/target/ohsome-planet.jar"
 
     if not os.path.exists(jar_path):
-        raise FileNotFoundError(f"❌ The JAR file {jar_path} is missing. Please build the ohsome-planet tool as described in its README.")
+        raise FileNotFoundError(
+            f"❌ The JAR file {jar_path} is missing. Please build the ohsome-planet tool as described in its README."
+        )
 
     if os.path.exists(geoparquet_dir):
         if not overwrite:
-            user_input = input(f"⚠️ GeoParquet directory {geoparquet_dir} already exists. Do you want to overwrite it? (y/n): ").strip().lower()
-            if user_input != 'y':
+            user_input = (
+                input(
+                    f"⚠️ GeoParquet directory {geoparquet_dir} already exists. Do you want to overwrite it? (y/n): "
+                )
+                .strip()
+                .lower()
+            )
+            if user_input != "y":
                 print("✅ GeoParquet directory already exists. Skipping conversion.")
                 return geoparquet_dir
 
@@ -175,11 +195,20 @@ def convert_to_geoparquet(filtered_file, output_dir="data/parquet", overwrite=Fa
 def check_osmium_installed():
     """Check if osmium is installed and accessible."""
     try:
-        subprocess.run(["osmium", "--version"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(
+            ["osmium", "--version"],
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
     except FileNotFoundError:
-        raise FileNotFoundError("❌ Osmium is not installed or not in the PATH. Please install Osmium and try again.")
+        raise FileNotFoundError(
+            "❌ Osmium is not installed or not in the PATH. Please install Osmium and try again."
+        )
     except subprocess.CalledProcessError:
-        raise RuntimeError("❌ Osmium is installed but not functioning correctly. Please check your installation.")
+        raise RuntimeError(
+            "❌ Osmium is installed but not functioning correctly. Please check your installation."
+        )
 
 
 # Call this function at the start of the script

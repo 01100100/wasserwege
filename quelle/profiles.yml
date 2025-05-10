@@ -1,0 +1,12 @@
+quelle:
+  target: local
+  outputs:
+    local:
+      type: duckdb
+      path: ../data/pond.duckdb
+      threads: 14  # Multiple threads for parallel processing speed up 🔥
+
+      # Required DuckDB extensions for geospatial and parquet support
+      extensions:
+        - spatial
+        - parquet
