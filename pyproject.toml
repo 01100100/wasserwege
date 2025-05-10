@@ -11,7 +11,8 @@ dependencies = [
     "gpxpy>=1.6.2",
     "pyarrow>=20.0.0",
     "requests>=2.32.3",
+    "tqdm>=4.65.0",
 ]
 
 [dependency-groups]
-dev = ["pyarrow-stubs>=19.3", "ruff>=0.11.9", "types-request"]
+dev = ["pyarrow-stubs>=19.3", "ruff>=0.11.9"]

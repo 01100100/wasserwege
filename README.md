@@ -2,6 +2,7 @@
 
 Wasserwege is a high-performance service that allows users to upload a `GPX` file and (almost) instantly determine which waterways their route has crossed. It leverages spatial indexing, an incredible duck of a database and open data from OSM to provide blazing-fast results 🔥
 
+
 ## Features ⚡️
 
 - Upload a `.gpx` file to detect intersected waterways.
@@ -109,7 +110,11 @@ uvicorn server:app --host 0.0.0.0 --port 8000 --workers 4
 
 ## Preparing German Waterway Data
 
-To prepare the German waterway data, use the `prepare_german_waterways.py` script. This script automates the following steps:
+To prepare the German waterway data, use the `prepare_german_waterways.py` script.
+
+<script async id="asciicast-569727" src="https://asciinema.org/a/569727.js"></script>
+
+The script automates the following steps:
 
 1. Downloads the latest German OSM file from [Geofabrik](https://download.geofabrik.de/europe/germany-latest.osm.pbf).
 2. Filters the OSM file for waterways using `osmium`.
@@ -160,18 +165,20 @@ Other installation methods are available on the [Osmium installation page](https
 
 ### ohsome-planet
 
-The ohsome-planet tool converts OSM PBF files into GeoParquet format for geospatial analysis. You can install it into a subdirectory of your project using the following steps:
+The ohsome-planet tool converts OSM PBF files into GeoParquet format for geospatial analysis.
 
-1. Clone the ohsome-planet repository:
-   ```bash
-   git clone --recurse-submodules https://github.com/GIScience/ohsome-planet.git
-   cd ohsome-planet
-   ```
-2. Build the tool using Maven:
-   ```bash
-   ./mvnw clean package -DskipTests
-   ```
-3. Ensure you have Java 21 installed to run the tool.
+#### Requirements
+
+- Java 21 is required to run the tool.
+- Maven is required to build the tool.
+
+You can install it into a subdirectory of your project and build it using the following commands:
+
+```bash
+git clone --recurse-submodules https://github.com/GIScience/ohsome-planet.git
+cd ohsome-planet
+./mvnw clean package -DskipTests
+```
 
 Once these tools are installed, you can use the `prepare_german_waterways.py` script to process waterway data.
 
