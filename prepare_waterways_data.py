@@ -3,6 +3,7 @@ import subprocess
 from tqdm import tqdm
 from enum import Enum
 import click
+import sys
 
 
 class Country(Enum):
@@ -38,7 +39,10 @@ class Country(Enum):
     help="Country to download OSM data for.",
 )
 @click.option("--overwrite", is_flag=True, help="Overwrite existing data at each step.")
-def main(country, overwrite):
+@click.option(
+    "--skip-dbt", is_flag=True, help="Skip running the dbt after data preparation."
+)
+def main(country, overwrite, skip_dbt):
     """Prepare waterway data for the specified country."""
     print("🚀 Starting waterway data preparation...")
     country_enum = Country[country.upper()]
@@ -48,6 +52,9 @@ def main(country, overwrite):
     geoparquet_dir = convert_to_geoparquet(filtered_file, overwrite=overwrite)
 
     print(f"🎉 GeoParquet files are ready in {geoparquet_dir}.")
+
+    if not skip_dbt:
+        run_dbt(overwrite)
 
 
 def download_osm_file(country: Country, output_dir="data/raw", overwrite=False):
@@ -192,6 +199,72 @@ def convert_to_geoparquet(filtered_file, output_dir="data/parquet", overwrite=Fa
     return geoparquet_dir
 
 
+def run_dbt(overwrite=False):
+    """Run dbt to process waterways data"""
+    # Get the absolute path to the quelle directory
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    quelle_dir = os.path.join(current_dir, "quelle")
+
+    if not os.path.exists(quelle_dir):
+        print(f"❌ Could not find quelle directory at {quelle_dir}")
+        return
+
+    # Check if local duckdb database exists
+    db_path = os.path.join(current_dir, "data", "pond.duckdb")
+
+    if os.path.exists(db_path) and not overwrite:
+        user_input = (
+            input(
+                f"⚠️ {db_path} already exists 🦆. Do you want to regenerate it? (y/n): "
+            )
+            .strip()
+            .lower()
+        )
+        if user_input != "y":
+            print("✅ Processed data already exists. Skipping dbt.")
+            return
+
+    print("🧮 Running dbt to transform waterways data...")
+
+    # Save current directory to return to it later
+    original_dir = os.getcwd()
+
+    try:
+        # Change to the quelle directory
+        os.chdir(quelle_dir)
+
+        # Run dbt build to execute the model and tests
+        with tqdm(total=100, desc="Running dbt", unit="%") as pbar:
+            process = subprocess.run(
+                ["dbt", "build"],
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            )
+
+            for line in process.stdout.splitlines():
+                print(f"  dbt: {line}")
+
+            pbar.update(100)
+
+        print("✅ dbt execution complete.")
+
+        if os.path.exists(db_path):
+            print("🐣 A Fresh db was born...")
+        else:
+            print(f"⚠️ Expected duckdb file not found at {db_path}")
+
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Error running dbt: {e}")
+        print(e.stdout)
+    except Exception as e:
+        print(f"❌ Unexpected error running dbt: {e}")
+    finally:
+        # Return to the original directory
+        os.chdir(original_dir)
+
+
 def check_osmium_installed():
     """Check if osmium is installed and accessible."""
     try:
@@ -211,7 +284,36 @@ def check_osmium_installed():
         )
 
 
+def check_dbt_installed():
+    """Check if dbt is installed and accessible."""
+    try:
+        subprocess.run(
+            ["dbt", "--version"],
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+    except FileNotFoundError:
+        raise FileNotFoundError(
+            "❌ dbt is not installed or not in the PATH. Please install dbt and try again."
+        )
+    except subprocess.CalledProcessError:
+        raise RuntimeError(
+            "❌ dbt is installed but not functioning correctly. Please check your installation."
+        )
+
+
 # Call this function at the start of the script
 if __name__ == "__main__":
     check_osmium_installed()
+    try:
+        check_dbt_installed()
+    except Exception as e:
+        print(f"Warning: {e}")
+        print(
+            "Continuing without dbt. The --skip-dbt flag will be automatically applied."
+        )
+        if "--skip-dbt" not in sys.argv:
+            sys.argv.append("--skip-dbt")
+
     main()

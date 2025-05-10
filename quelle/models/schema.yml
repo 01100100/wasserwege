@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: waterways
+    description: "A table of waterways with names extracted from OpenStreetMap"
+    columns:
+      - name: id
+        description: "The unique identifier for the waterway from OSM"
+        tests:
+          - not_null
+      - name: waterway_name
+        description: "The name of the waterway"
+        tests:
+          - not_null
+      - name: type
+        description: "The type of waterway (river, stream, canal, etc.)"
+      - name: geom
+        description: "The spatial geometry of the waterway"
+        tests:
+          - not_null

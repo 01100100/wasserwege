@@ -1,0 +1,72 @@
+version: 2
+
+sources:
+
+  - name: osm
+    description: |
+      This source contains data extracted from OpenStreetMap (OSM) for waterways in Germany.
+
+    loader: osmium + ohsome-planet
+    tables:
+      - name: waterways
+        description: |
+          This table contains the waterways from OpenStreetMap.
+
+          The data was downloaded from [Geofabrik](https://download.geofabrik.de/) and filtered to only include waterways with osmusmis. The data was then converted to a parquet file using ohsome-planet.
+        meta:
+          external_location: "../data/parquet/germany/contributions/latest/*.parquet"
+        columns:
+          - name: status
+            description: Status of the waterway (e.g., latest).
+          - name: valid_from
+            description: Timestamp indicating when the waterway data became valid.
+          - name: valid_to
+            description: Timestamp indicating when the waterway data is no longer valid.
+          - name: osm_type
+            description: Type of OSM object (e.g., node, way).
+          - name: osm_id
+            description: Unique identifier for the OSM object.
+          - name: osm_version
+            description: Version of the OSM object.
+          - name: osm_minor_version
+            description: Minor version of the OSM object.
+          - name: osm_edits
+            description: Number of edits made to the OSM object.
+          - name: osm_last_edit
+            description: Timestamp of the last edit made to the OSM object.
+          - name: user
+            description: User information including ID and name.
+          - name: tags
+            description: Key-value pairs of tags associated with the OSM object.
+          - name: tags_before
+            description: Key-value pairs of tags before the last edit.
+          - name: changeset
+            description: Information about the changeset including ID, timestamps, and tags.
+          - name: bbox
+            description: Bounding box of the waterway geometry.
+          - name: centroid
+            description: Centroid of the waterway geometry.
+          - name: xzcode
+            description: Spatial indexing information for the waterway.
+          - name: geometry_type
+            description: Type of geometry (e.g., Polygon, LineString).
+          - name: geometry
+            description: Geometry of the waterway in binary format.
+          - name: area
+            description: Area of the waterway.
+          - name: area_delta
+            description: Change in area of the waterway.
+          - name: length
+            description: Length of the waterway.
+          - name: length_delta
+            description: Change in length of the waterway.
+          - name: contrib_type
+            description: Type of contribution (e.g., creation).
+          - name: refs
+            description: References to other OSM objects.
+          - name: members
+            description: Members of the waterway relation including type, ID, and role.
+          - name: countries
+            description: List of countries the waterway passes through.
+          - name: build_time
+            description: Time taken to build the waterway data.

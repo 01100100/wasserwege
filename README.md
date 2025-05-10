@@ -110,7 +110,7 @@ uvicorn server:app --host 0.0.0.0 --port 8000 --workers 4
 
 ## Preparing German Waterway Data
 
-To prepare the German waterway data, use the `prepare_german_waterways.py` script.
+To prepare the German waterway data, use the `prepare_waterways_data.py` script.
 
 <script async id="asciicast-569727" src="https://asciinema.org/a/569727.js"></script>
 
@@ -131,7 +131,7 @@ The script automates the following steps:
 Run the script as follows:
 
 ```bash
-python prepare_german_waterways.py
+python prepare_waterways_data.py
 ```
 
 The script will:
@@ -180,7 +180,7 @@ cd ohsome-planet
 ./mvnw clean package -DskipTests
 ```
 
-Once these tools are installed, you can use the `prepare_german_waterways.py` script to process waterway data.
+Once these tools are installed, you can use the `prepare_waterways_data.py` script to process waterway data.
 
 ## Shoutouts
 
