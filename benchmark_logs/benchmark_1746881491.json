@@ -1,0 +1,366 @@
+{
+  "2025-05-09_2228465740_Radfahren.gpx": {
+    "crossing_count": 83,
+    "gpx_parsing": {
+      "avg_ms": 317.374,
+      "max_ms": 327.72,
+      "median_ms": 312.68,
+      "min_ms": 311.2
+    },
+    "intersection_finding": {
+      "avg_ms": 245.256,
+      "max_ms": 270.43,
+      "median_ms": 240.48,
+      "min_ms": 226.9
+    },
+    "linestring_conversion": {
+      "avg_ms": 13.792,
+      "max_ms": 14.0,
+      "median_ms": 13.86,
+      "min_ms": 13.55
+    },
+    "round_trip": {
+      "avg_ms": 786.713695526123,
+      "max_ms": 819.5970058441162,
+      "median_ms": 791.8219566345215,
+      "min_ms": 761.8138790130615
+    },
+    "server_processing": {
+      "avg_ms": 576.754,
+      "max_ms": 607.59,
+      "median_ms": 580.91,
+      "min_ms": 552.95
+    }
+  },
+  "Addicted_to_the_Shred_.gpx": {
+    "crossing_count": 293,
+    "gpx_parsing": {
+      "avg_ms": 532.382,
+      "max_ms": 547.27,
+      "median_ms": 537.97,
+      "min_ms": 507.22
+    },
+    "intersection_finding": {
+      "avg_ms": 1931.492,
+      "max_ms": 2098.03,
+      "median_ms": 1920.05,
+      "min_ms": 1835.62
+    },
+    "linestring_conversion": {
+      "avg_ms": 25.396,
+      "max_ms": 38.1,
+      "median_ms": 22.46,
+      "min_ms": 21.81
+    },
+    "round_trip": {
+      "avg_ms": 2856.9665908813477,
+      "max_ms": 3038.9628410339355,
+      "median_ms": 2822.5440979003906,
+      "min_ms": 2786.2648963928223
+    },
+    "server_processing": {
+      "avg_ms": 2489.796,
+      "max_ms": 2659.48,
+      "median_ms": 2467.16,
+      "min_ms": 2418.69
+    }
+  },
+  "Consistent_Shredibility_.gpx": {
+    "crossing_count": 18,
+    "gpx_parsing": {
+      "avg_ms": 36.498,
+      "max_ms": 43.09,
+      "median_ms": 35.15,
+      "min_ms": 34.31
+    },
+    "intersection_finding": {
+      "avg_ms": 44.108000000000004,
+      "max_ms": 45.42,
+      "median_ms": 43.57,
+      "min_ms": 43.29
+    },
+    "linestring_conversion": {
+      "avg_ms": 1.824,
+      "max_ms": 1.85,
+      "median_ms": 1.82,
+      "min_ms": 1.81
+    },
+    "round_trip": {
+      "avg_ms": 110.9562873840332,
+      "max_ms": 118.33524703979492,
+      "median_ms": 109.50708389282227,
+      "min_ms": 107.4831485748291
+    },
+    "server_processing": {
+      "avg_ms": 82.45,
+      "max_ms": 89.81,
+      "median_ms": 80.56,
+      "min_ms": 79.56
+    }
+  },
+  "Easter_eggs_and_holy_shreds_.gpx": {
+    "crossing_count": 23,
+    "gpx_parsing": {
+      "avg_ms": 54.018,
+      "max_ms": 61.8,
+      "median_ms": 52.55,
+      "min_ms": 50.89
+    },
+    "intersection_finding": {
+      "avg_ms": 45.076,
+      "max_ms": 46.24,
+      "median_ms": 45.06,
+      "min_ms": 44.11
+    },
+    "linestring_conversion": {
+      "avg_ms": 2.96,
+      "max_ms": 3.33,
+      "median_ms": 2.97,
+      "min_ms": 2.65
+    },
+    "round_trip": {
+      "avg_ms": 125.17867088317871,
+      "max_ms": 133.98313522338867,
+      "median_ms": 123.2602596282959,
+      "min_ms": 121.19293212890625
+    },
+    "server_processing": {
+      "avg_ms": 102.082,
+      "max_ms": 110.71,
+      "median_ms": 100.1,
+      "min_ms": 98.64
+    }
+  },
+  "I_d_lose_my_shred_if_it_wasn_t_screwed_on_.gpx": {
+    "crossing_count": 68,
+    "gpx_parsing": {
+      "avg_ms": 114.58800000000001,
+      "max_ms": 126.17,
+      "median_ms": 109.98,
+      "min_ms": 105.9
+    },
+    "intersection_finding": {
+      "avg_ms": 75.998,
+      "max_ms": 78.81,
+      "median_ms": 74.7,
+      "min_ms": 73.81
+    },
+    "linestring_conversion": {
+      "avg_ms": 7.622,
+      "max_ms": 14.86,
+      "median_ms": 5.84,
+      "min_ms": 5.68
+    },
+    "round_trip": {
+      "avg_ms": 297.4961757659912,
+      "max_ms": 305.87005615234375,
+      "median_ms": 297.29294776916504,
+      "min_ms": 291.8529510498047
+    },
+    "server_processing": {
+      "avg_ms": 198.428,
+      "max_ms": 207.01,
+      "median_ms": 194.86,
+      "min_ms": 189.67
+    }
+  },
+  "Sauna_Schwitzen_und_Shredden_.gpx": {
+    "crossing_count": 12,
+    "gpx_parsing": {
+      "avg_ms": 22.528,
+      "max_ms": 22.89,
+      "median_ms": 22.59,
+      "min_ms": 21.83
+    },
+    "intersection_finding": {
+      "avg_ms": 42.508,
+      "max_ms": 43.21,
+      "median_ms": 42.21,
+      "min_ms": 41.92
+    },
+    "linestring_conversion": {
+      "avg_ms": 1.204,
+      "max_ms": 1.47,
+      "median_ms": 1.14,
+      "min_ms": 1.13
+    },
+    "round_trip": {
+      "avg_ms": 85.46571731567383,
+      "max_ms": 90.35110473632812,
+      "median_ms": 84.4578742980957,
+      "min_ms": 83.53686332702637
+    },
+    "server_processing": {
+      "avg_ms": 66.25999999999999,
+      "max_ms": 67.13,
+      "median_ms": 65.94,
+      "min_ms": 65.46
+    }
+  },
+  "Shredded_legs_.gpx": {
+    "crossing_count": 26,
+    "gpx_parsing": {
+      "avg_ms": 35.148,
+      "max_ms": 35.76,
+      "median_ms": 35.1,
+      "min_ms": 34.69
+    },
+    "intersection_finding": {
+      "avg_ms": 45.208,
+      "max_ms": 45.37,
+      "median_ms": 45.27,
+      "min_ms": 45.01
+    },
+    "linestring_conversion": {
+      "avg_ms": 2.088,
+      "max_ms": 2.39,
+      "median_ms": 2.18,
+      "min_ms": 1.8
+    },
+    "round_trip": {
+      "avg_ms": 108.22587013244629,
+      "max_ms": 114.41802978515625,
+      "median_ms": 107.40518569946289,
+      "min_ms": 105.73101043701172
+    },
+    "server_processing": {
+      "avg_ms": 82.47,
+      "max_ms": 83.16,
+      "median_ms": 82.65,
+      "min_ms": 81.54
+    }
+  },
+  "The_History_of_the_Shrednaissance_World_.gpx": {
+    "crossing_count": 14,
+    "gpx_parsing": {
+      "avg_ms": 51.686,
+      "max_ms": 63.7,
+      "median_ms": 46.7,
+      "min_ms": 46.15
+    },
+    "intersection_finding": {
+      "avg_ms": 58.502,
+      "max_ms": 107.28,
+      "median_ms": 45.67,
+      "min_ms": 45.11
+    },
+    "linestring_conversion": {
+      "avg_ms": 2.468,
+      "max_ms": 2.75,
+      "median_ms": 2.39,
+      "min_ms": 2.38
+    },
+    "round_trip": {
+      "avg_ms": 148.57888221740723,
+      "max_ms": 215.2409553527832,
+      "median_ms": 132.89666175842285,
+      "min_ms": 128.19790840148926
+    },
+    "server_processing": {
+      "avg_ms": 112.7,
+      "max_ms": 173.43,
+      "median_ms": 98.02,
+      "min_ms": 94.02
+    }
+  },
+  "The_Shredligeri_rulers_of_Verona_.gpx": {
+    "crossing_count": 8,
+    "gpx_parsing": {
+      "avg_ms": 11.224,
+      "max_ms": 11.41,
+      "median_ms": 11.29,
+      "min_ms": 11.03
+    },
+    "intersection_finding": {
+      "avg_ms": 41.46,
+      "max_ms": 43.2,
+      "median_ms": 41.22,
+      "min_ms": 39.89
+    },
+    "linestring_conversion": {
+      "avg_ms": 0.56,
+      "max_ms": 0.58,
+      "median_ms": 0.56,
+      "min_ms": 0.54
+    },
+    "round_trip": {
+      "avg_ms": 61.29770278930664,
+      "max_ms": 64.9878978729248,
+      "median_ms": 61.68866157531738,
+      "min_ms": 58.567047119140625
+    },
+    "server_processing": {
+      "avg_ms": 53.256,
+      "max_ms": 55.2,
+      "median_ms": 52.84,
+      "min_ms": 51.74
+    }
+  },
+  "The_Tragedy_of_Romeo_and_Juliet_by_William_Shredspeare_Play_by_William_Shakespeare.gpx": {
+    "crossing_count": 3,
+    "gpx_parsing": {
+      "avg_ms": 12.5,
+      "max_ms": 18.56,
+      "median_ms": 11.08,
+      "min_ms": 10.7
+    },
+    "intersection_finding": {
+      "avg_ms": 41.072,
+      "max_ms": 43.35,
+      "median_ms": 40.41,
+      "min_ms": 39.71
+    },
+    "linestring_conversion": {
+      "avg_ms": 0.56,
+      "max_ms": 0.6,
+      "median_ms": 0.56,
+      "min_ms": 0.54
+    },
+    "round_trip": {
+      "avg_ms": 60.95881462097168,
+      "max_ms": 65.41705131530762,
+      "median_ms": 60.15586853027344,
+      "min_ms": 58.18819999694824
+    },
+    "server_processing": {
+      "avg_ms": 54.146,
+      "max_ms": 58.84,
+      "median_ms": 53.14,
+      "min_ms": 51.66
+    }
+  },
+  "_aggregate": {
+    "gpx_parsing": {
+      "avg_ms": 118.7946,
+      "max_ms": 547.27,
+      "median_ms": 44.620000000000005,
+      "min_ms": 10.7
+    },
+    "intersection_finding": {
+      "avg_ms": 257.068,
+      "max_ms": 2098.03,
+      "median_ms": 45.19,
+      "min_ms": 39.71
+    },
+    "linestring_conversion": {
+      "avg_ms": 5.8474,
+      "max_ms": 38.1,
+      "median_ms": 2.385,
+      "min_ms": 0.54
+    },
+    "round_trip": {
+      "avg_ms": 464.18384075164795,
+      "max_ms": 3038.9628410339355,
+      "median_ms": 119.76408958435059,
+      "min_ms": 58.18819999694824
+    },
+    "server_processing": {
+      "avg_ms": 381.8342,
+      "max_ms": 2659.48,
+      "median_ms": 91.91499999999999,
+      "min_ms": 51.66
+    },
+    "total_crossings": 548,
+    "total_files": 10
+  }
+}
