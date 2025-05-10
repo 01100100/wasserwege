@@ -10,12 +10,15 @@ dependencies = [
     "fastapi>=0.115.12",
     "gpxpy>=1.6.2",
     "pyarrow>=20.0.0",
+    "python-multipart>=0.0.20",
     "requests>=2.32.3",
     "tqdm>=4.65.0",
+    "uvicorn>=0.34.2",
 ]
 
 [dependency-groups]
 dev = [
+    "fastapi[standard]>=0.115.12",
     "pyarrow-stubs>=19.3",
     "ruff>=0.11.9",
     "shandy-sqlfmt[jinjafmt]>=0.26.0",

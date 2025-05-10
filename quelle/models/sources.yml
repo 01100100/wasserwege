@@ -4,17 +4,17 @@ sources:
 
   - name: osm
     description: |
-      This source contains data extracted from OpenStreetMap (OSM) for waterways in Germany.
+      This source contains data extracted from OpenStreetMap (OSM) for waterways in {{ var('country', 'the selected country') }}.
 
     loader: osmium + ohsome-planet
     tables:
       - name: waterways
         description: |
-          This table contains the waterways from OpenStreetMap.
+          This table contains the waterways from OpenStreetMap for {{ var('country', 'the selected country') }}.
 
           The data was downloaded from [Geofabrik](https://download.geofabrik.de/) and filtered to only include waterways with osmusmis. The data was then converted to a parquet file using ohsome-planet.
         meta:
-          external_location: "../data/parquet/germany/contributions/latest/*.parquet"
+          external_location: "../data/parquet/{{ var('country') }}/contributions/latest/*.parquet"
         columns:
           - name: status
             description: Status of the waterway (e.g., latest).

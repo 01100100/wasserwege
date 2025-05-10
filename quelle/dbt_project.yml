@@ -17,6 +17,9 @@ seed-paths: ["seeds"]
 macro-paths: ["macros"]
 snapshot-paths: ["snapshots"]
 
+vars:
+  country: 'germany' # Default country, will be overridden by prepare_waterways_data.py
+
 clean-targets:
   - "target"
   - "dbt_packages"

@@ -7,27 +7,28 @@ import sys
 
 
 class Country(Enum):
-    GERMANY = "germany"
-    FRANCE = "france"
-    ITALY = "italy"
-    SPAIN = "spain"
-    POLAND = "poland"
-    NETHERLANDS = "netherlands"
-    BELGIUM = "belgium"
-    SWITZERLAND = "switzerland"
+    EUROPE = "europe"
     AUSTRIA = "austria"
-    DENMARK = "denmark"
-    SWEDEN = "sweden"
-    NORWAY = "norway"
-    FINLAND = "finland"
-    PORTUGAL = "portugal"
+    BELGIUM = "belgium"
+    CROATIA = "croatia"
     CZECHIA = "czech-republic"
+    DENMARK = "denmark"
+    FINLAND = "finland"
+    FRANCE = "france"
+    GERMANY = "germany"
     HUNGARY = "hungary"
+    IRELAND = "ireland"
+    ITALY = "italy"
+    LUXEMBOURG = "luxembourg"
+    NETHERLANDS = "netherlands"
+    NORWAY = "norway"
+    POLAND = "poland"
+    PORTUGAL = "portugal"
     SLOVAKIA = "slovakia"
     SLOVENIA = "slovenia"
-    CROATIA = "croatia"
-    LUXEMBOURG = "luxembourg"
-    IRELAND = "ireland"
+    SPAIN = "spain"
+    SWEDEN = "sweden"
+    SWITZERLAND = "switzerland"
     UNITED_KINGDOM = "great-britain"
 
 
@@ -35,51 +36,59 @@ class Country(Enum):
 @click.option(
     "--country",
     type=click.Choice([c.name for c in Country], case_sensitive=False),
-    default="GERMANY",
-    help="Country to download OSM data for.",
+    help="Country which to process OSM data 🌍",
+    required=True,
 )
-@click.option("--overwrite", is_flag=True, help="Overwrite existing data at each step.")
 @click.option(
     "--skip-dbt", is_flag=True, help="Skip running the dbt after data preparation."
 )
-def main(country, overwrite, skip_dbt):
+def main(country, skip_dbt):
     """Prepare waterway data for the specified country."""
-    print("🚀 Starting waterway data preparation...")
+    print(f"🚀 Starting waterway data preparation for {country}...")
     country_enum = Country[country.upper()]
 
-    osm_file = download_osm_file(country_enum, overwrite=overwrite)
-    filtered_file = filter_waterways(osm_file, overwrite=overwrite)
-    geoparquet_dir = convert_to_geoparquet(filtered_file, overwrite=overwrite)
+    osm_file = download_osm_file(country_enum)
+    if not osm_file:
+        print("🛑 Halting process as OSM file step was skipped or failed.")
+        return
+
+    filtered_file = filter_waterways(country_enum, osm_file)
+    if not filtered_file:
+        print("🛑 Halting process as filtering step was skipped or failed.")
+        return
+
+    geoparquet_dir = convert_to_geoparquet(country_enum, filtered_file)
+    if not geoparquet_dir:
+        print("🛑 Halting process as GeoParquet conversion was skipped or failed.")
+        return
 
     print(f"🎉 GeoParquet files are ready in {geoparquet_dir}.")
 
     if not skip_dbt:
-        run_dbt(overwrite)
+        run_dbt(country_enum)
 
 
-def download_osm_file(country: Country, output_dir="data/raw", overwrite=False):
+def download_osm_file(country: Country, output_dir="data/raw"):
     """Download the latest OSM file for a given country from Geofabrik."""
-    os.makedirs(output_dir, exist_ok=True)
-    osm_file = os.path.join(output_dir, f"{country.value}-latest.osm.pbf")
+    # Create country-specific subdirectory
+    country_dir = os.path.join(output_dir, country.value)
+    os.makedirs(country_dir, exist_ok=True)
+
+    osm_file = os.path.join(country_dir, f"{country.value}-latest.osm.pbf")
 
     if os.path.exists(osm_file):
-        if not overwrite:
-            user_input = (
-                input(
-                    f"⚠️ {osm_file} already exists. Do you want to overwrite it? (y/n): "
-                )
-                .strip()
-                .lower()
+        if not click.confirm(
+            f"⚠️ {osm_file} already exists. Do you want to overwrite it?",
+            default=False,
+        ):
+            print(f"✅ {osm_file} already exists. Skipping download.")
+            return osm_file
+        else:
+            print(
+                f"ℹ️ {osm_file} already exists. Proceeding with overwrite as confirmed by user."
             )
-            if user_input != "y":
-                print(f"✅ {osm_file} already exists. Skipping download.")
-                return osm_file
 
     print(f"🌍 Downloading {country.name} OSM file...")
-    url = f"https://download.geofabrik.de/europe/{country.value}-latest.osm.pbf"
-    subprocess.run(["curl", "-o", osm_file, url], check=True)
-    print(f"✅ Download complete: {osm_file}")
-
     return osm_file
 
 
@@ -105,24 +114,29 @@ def check_filtered_file(filtered_file):
         return False
 
 
-def filter_waterways(osm_file, output_dir="data/filtered", overwrite=False):
+def filter_waterways(country: Country, osm_file, output_dir="data/filtered"):
     """Filter the OSM file for waterways and relations using osmium."""
-    filtered_file = os.path.join(output_dir, "germany-waterways.osm.pbf")
+    # Create country-specific subdirectory
+    country_dir = os.path.join(output_dir, country.value)
+    os.makedirs(country_dir, exist_ok=True)
+
+    filtered_file = os.path.join(country_dir, f"{country.value}-waterways.osm.pbf")
 
     if os.path.exists(filtered_file):
-        if not overwrite:
-            user_input = (
-                input(
-                    f"⚠️ {filtered_file} already exists. Do you want to overwrite it? (y/n): "
-                )
-                .strip()
-                .lower()
+        if not click.confirm(
+            f"⚠️ Filtered file {filtered_file} already exists. Do you want to overwrite it?",
+            default=False,
+        ):
+            print(
+                f"✅ Filtered file {filtered_file} already exists. Skipping filtering."
             )
-            if user_input != "y":
-                print("✅ Filtered waterways file is valid. Skipping filtering.")
-                return filtered_file
+            return filtered_file
+        else:
+            print(
+                f"ℹ️ Filtered file {filtered_file} already exists. Proceeding with overwrite as confirmed by user."
+            )
 
-    print("🚰 Filtering waterways and relations from OSM file...")
+    print(f"🚰 Filtering waterways and relations from {country.name} OSM file...")
     with tqdm(total=100, desc="Filtering", unit="%") as pbar:
         process = subprocess.Popen(
             [
@@ -141,9 +155,12 @@ def filter_waterways(osm_file, output_dir="data/filtered", overwrite=False):
             text=True,
         )
 
-        for line in process.stdout:
-            print(line.strip())
-            pbar.update(1)  # Simulate progress bar update
+        if process.stdout:
+            for line in process.stdout:
+                print(line.strip())
+                pbar.update(1)
+        else:
+            print("Warning: No stdout from osmium process")
 
         process.wait()
 
@@ -154,9 +171,13 @@ def filter_waterways(osm_file, output_dir="data/filtered", overwrite=False):
     return filtered_file
 
 
-def convert_to_geoparquet(filtered_file, output_dir="data/parquet", overwrite=False):
+def convert_to_geoparquet(country: Country, filtered_file, output_dir="data/parquet"):
     """Convert the filtered OSM file to GeoParquet using ohsome-planet."""
-    geoparquet_dir = os.path.join(output_dir, "germany")
+    # Create country-specific subdirectory
+    country_dir = os.path.join(output_dir, country.value)
+    os.makedirs(country_dir, exist_ok=True)
+
+    geoparquet_dir = country_dir
     jar_path = "ohsome-planet/ohsome-planet-cli/target/ohsome-planet.jar"
 
     if not os.path.exists(jar_path):
@@ -165,19 +186,20 @@ def convert_to_geoparquet(filtered_file, output_dir="data/parquet", overwrite=Fa
         )
 
     if os.path.exists(geoparquet_dir):
-        if not overwrite:
-            user_input = (
-                input(
-                    f"⚠️ GeoParquet directory {geoparquet_dir} already exists. Do you want to overwrite it? (y/n): "
-                )
-                .strip()
-                .lower()
+        if not click.confirm(
+            f"⚠️ GeoParquet directory {geoparquet_dir} already exists. Do you want to overwrite it?",
+            default=False,
+        ):
+            print(
+                f"✅ GeoParquet directory {geoparquet_dir} already exists. Skipping conversion."
             )
-            if user_input != "y":
-                print("✅ GeoParquet directory already exists. Skipping conversion.")
-                return geoparquet_dir
+            return geoparquet_dir
+        else:
+            print(
+                f"ℹ️ GeoParquet directory {geoparquet_dir} already exists. Proceeding with overwrite as confirmed by user."
+            )
 
-    print("📦 Converting waterways to GeoParquet format...")
+    print(f"📦 Converting {country.name} waterways to GeoParquet format...")
     with tqdm(total=100, desc="Converting", unit="%") as pbar:
         subprocess.run(
             [
@@ -199,7 +221,7 @@ def convert_to_geoparquet(filtered_file, output_dir="data/parquet", overwrite=Fa
     return geoparquet_dir
 
 
-def run_dbt(overwrite=False):
+def run_dbt(country: Country):
     """Run dbt to process waterways data"""
     # Get the absolute path to the quelle directory
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -212,19 +234,19 @@ def run_dbt(overwrite=False):
     # Check if local duckdb database exists
     db_path = os.path.join(current_dir, "data", "pond.duckdb")
 
-    if os.path.exists(db_path) and not overwrite:
-        user_input = (
-            input(
-                f"⚠️ {db_path} already exists 🦆. Do you want to regenerate it? (y/n): "
-            )
-            .strip()
-            .lower()
-        )
-        if user_input != "y":
-            print("✅ Processed data already exists. Skipping dbt.")
+    if os.path.exists(db_path):
+        if not click.confirm(
+            f"⚠️ Processed data {db_path} already exists. Do you want to regenerate it?",
+            default=False,
+        ):
+            print(f"✅ Processed data {db_path} already exists. Skipping dbt.")
             return
+        else:
+            print(
+                f"ℹ️ Processed data {db_path} already exists. Proceeding with regeneration as confirmed by user."
+            )
 
-    print("🧮 Running dbt to transform waterways data...")
+    print(f"🧮 Running dbt to transform {country.name} waterways data...")
 
     # Save current directory to return to it later
     original_dir = os.getcwd()
@@ -235,8 +257,9 @@ def run_dbt(overwrite=False):
 
         # Run dbt build to execute the model and tests
         with tqdm(total=100, desc="Running dbt", unit="%") as pbar:
+            # Pass country as a variable to dbt
             process = subprocess.run(
-                ["dbt", "build"],
+                ["dbt", "build", "--vars", f"{{country: {country.value}}}", "--debug"],
                 check=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
@@ -303,7 +326,6 @@ def check_dbt_installed():
         )
 
 
-# Call this function at the start of the script
 if __name__ == "__main__":
     check_osmium_installed()
     try:
