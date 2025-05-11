@@ -1,13 +1,14 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException
+from fastapi import FastAPI, File, UploadFile
 import duckdb
-import gpxpy
 import json
 import time
 import uvicorn
+import io
+import lxml.etree as lxml_ET
 
 app = FastAPI(
-    title="Waterway Crossing API",
-    description="Fast service to detect waterway crossings from GPX files",
+    title="Waterway Intersection API",
+    description="Optimized service to find waterways intersecting a GPX route",
 )
 
 DB_PATH = "data/pond.duckdb"
@@ -17,98 +18,90 @@ conn = duckdb.connect(DB_PATH, read_only=True)
 conn.execute("LOAD spatial;")
 
 
+def custom_parse_gpx(gpx_content):
+    """Custom fast GPX parser using ElementTree with optimizations"""
+    start_time = time.time()
+
+    # Parse with lxml's faster parser
+    parser = lxml_ET.XMLParser(remove_blank_text=True, recover=True)
+    root = lxml_ET.parse(io.BytesIO(gpx_content), parser).getroot()
+    # Define namespace for GPX 1.1
+    ns = {"gpx": "http://www.topografix.com/GPX/1/1"}
+    # Fast path using XPath directly
+    points = [
+        (float(pt.get("lon", 0)), float(pt.get("lat", 0)))
+        for pt in root.xpath(".//gpx:trkpt", namespaces=ns)
+        if pt.get("lat") and pt.get("lon")
+    ]
+
+    parse_time = time.time() - start_time
+    return points, parse_time
+
+
 @app.post("/process_gpx")
 async def process_gpx(file: UploadFile = File(...)):
     """Process GPX file and find waterway intersections"""
-    overall_start_time = time.time()
-
-    # Read the uploaded file
+    t0 = time.time()
+    # Read the uploaded GPX file
     contents = await file.read()
+    t1 = time.time()
+    print(f"File read time: {t1 - t0:.2f} seconds")
 
-    try:
-        # Parse GPX
-        parse_start_time = time.time()
-        gpx = gpxpy.parse(contents.decode())
-        parse_time_ms = round((time.time() - parse_start_time) * 1000, 2)
-
-        # Extract linestring from GPX
-        linestring_start_time = time.time()
-        linestring = gpx_to_linestring(gpx)
-        linestring_time_ms = round((time.time() - linestring_start_time) * 1000, 2)
-
-        # Find intersections
-        intersection_start_time = time.time()
-        crossings = find_waterway_crossings(linestring)
-        intersection_time_ms = round((time.time() - intersection_start_time) * 1000, 2)
-
-        # Return results with timing
-        overall_processing_time_ms = round((time.time() - overall_start_time) * 1000, 2)
-        return {
-            "processing_times_ms": {
-                "total": overall_processing_time_ms,
-                "gpx_parsing": parse_time_ms,
-                "linestring_conversion": linestring_time_ms,
-                "intersection_finding": intersection_time_ms,
-            },
-            "total_crossings": len(crossings),
-            "crossings": crossings,
-        }
-
-    except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-
-def gpx_to_linestring(gpx):
-    """Convert GPX to WKT linestring"""
-    points = []
-    for track in gpx.tracks:
-        for segment in track.segments:
-            for point in segment.points:
-                points.append((point.longitude, point.latitude))
+    # Use the custom parser
+    points, parse_time = custom_parse_gpx(contents)
+    t2 = time.time()
+    print(f"Custom GPX parsing time: {t2 - t1:.2f} seconds")
 
     if len(points) < 2:
-        raise ValueError("GPX file must contain at least 2 points")
+        return {"error": "GPX file must contain at least 2 points"}
 
-    # Create WKT linestring
-    return f"LINESTRING({', '.join([f'{x} {y}' for x, y in points])})"
+    # Create linestring
+    linestring = f"LINESTRING({', '.join([f'{x} {y}' for x, y in points])})"
+    t3 = time.time()
+    print(f"GPX to LineString conversion time: {t3 - t2:.2f} seconds")
 
-
-def find_waterway_crossings(linestring):
-    """Find waterway crossings using spatial index"""
-
-    # Use prepared statement for better performance
-    # Query updated to use correct column names: w.geom, w.waterway_name, w.waterway_type
-    # Also aliased CTE's geometry column to avoid ambiguity if needed, though w.geom and r.geom are distinct.
-    result = conn.execute(
-        """
-        WITH route_geom_cte AS (
-            SELECT ST_GeomFromText($1) as geom
+    # Query waterways intersecting the route
+    query = """
+        WITH route AS (
+            SELECT ST_GeomFromText($1) AS geom,
+                   ST_Envelope(ST_GeomFromText($1)) AS bbox
         )
         SELECT
             w.id,
             w.waterway_name,
             w.waterway_type,
-            ST_AsGeoJSON(ST_Intersection(w.geom, r.geom)) as intersection_geojson
-        FROM waterways w, route_geom_cte r
-        WHERE ST_Intersects(w.geom, r.geom)
-    """,
-        [linestring],
-    ).fetchall()
+            ST_AsGeoJSON(ST_Intersection(w.geom, r.geom)) AS intersection_geojson
+        FROM waterways w, route r
+        WHERE ST_Intersects(w.geom, r.bbox)  -- First filter with bounding box (uses R-Tree)
+          AND ST_Intersects(w.geom, r.geom)  -- Then precise intersection
+        ORDER BY ST_Length(ST_Intersection(w.geom, r.geom)) DESC  -- Sort by intersection length
+    """
 
-    # Format results
-    crossings = []
-    # Updated loop variables to match the query's SELECT list
-    for rid, rname, rtype, r_intersection_geojson in result:
-        crossings.append(
+    try:
+        results = conn.execute(query, [linestring]).fetchall()
+        t4 = time.time()
+        print(f"Query execution time: {t4 - t3:.2f} seconds")
+
+        # Format results
+        t5 = time.time()
+        print("Formatting results...")
+        crossings = [
             {
-                "id": rid,
-                "name": rname if rname else "Unnamed waterway",
-                "type": rtype,
-                "intersection": json.loads(r_intersection_geojson),
+                "id": row[0],
+                "name": row[1] or "Unnamed waterway",
+                "type": row[2],
+                "intersection": json.loads(row[3]),
             }
-        )
+            for row in results
+        ]
+        t6 = time.time()
+        print(f"Result formatting time: {t6 - t5:.2f} seconds")
 
-    return crossings
+        print(f"Processing time: {t6 - t0:.2f} seconds")
+
+        return {"crossings": crossings}
+    except Exception as e:
+        return {"error": f"Query failed: {str(e)}", "linestring": linestring}
 
 
 @app.get("/health")
